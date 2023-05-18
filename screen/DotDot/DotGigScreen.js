@@ -940,7 +940,8 @@ const styles = StyleSheet.create({
     ////////////TEXT STYLES///////////////////
 
     gigs: {
-        padding: 10
+        padding: 10,
+       height: 750,
     },
 
     statsCard: {
@@ -974,7 +975,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         // padding: 10,
         shadowColor: 'white',
-        height: Dimensions.get('window').height * 0.7,
+      //  height: Dimensions.get('window').height * 0.7,
         borderRadius: 15
     },
 

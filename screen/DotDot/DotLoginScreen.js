@@ -107,7 +107,14 @@ const DotLoginScreen = ({ navigation }) => {
 
 
 
-                    <View style={styles.buttonView}>
+                   
+
+
+                </Card>
+                </KeyboardAvoidingView>
+
+
+                <View style={styles.buttonView}>
                         <TouchableOpacity onPress={handleLogin}>
 
                             <Card style={styles.submitbutton}>
@@ -120,10 +127,6 @@ const DotLoginScreen = ({ navigation }) => {
 
                         </TouchableOpacity>
                     </View>
-
-
-                </Card>
-                </KeyboardAvoidingView>
 
             </View>
             </ImageBackground>

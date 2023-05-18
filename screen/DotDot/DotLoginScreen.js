@@ -1,18 +1,38 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, ImageBackground, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import Card from '../components/card';
+import Card from '../../components/card';
 import { Dimensions } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list'
-import TitleText from '../components/TitleText';
+import TitleText from '../../components/TitleText';
 import { Icon } from 'react-native-elements'
-import BodyText from '../components/BodyText';
-
-const LoginScreen = ({ navigation }) => {
-
+import BodyText from '../../components/BodyText';
+import { auth } from '../../Database/config';
 
 
-   
 
+const DotLoginScreen = ({ navigation }) => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState('')
+
+    const handleLogin = () => {
+        auth
+        .signInWithEmailAndPassword(email, password)
+        .then(userCredentials => {
+            const user = userCredentials.user;
+            console.log( 'Logged in with:', user.email);
+           })
+           .catch(error => alert(error.message))
+    }
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (user) {
+                navigation.replace("DotHomeScreen")
+            }
+        })
+
+        return unsubscribe
+    }, [])
 
 
     return (
@@ -22,7 +42,7 @@ const LoginScreen = ({ navigation }) => {
 
 
         <ImageBackground
-                source={require('../assets/4k-background.png')}
+                source={require('../../assets/4k-background.png')}
                 resizeMode="cover"
                 style={styles.imageBackground}
             >
@@ -33,7 +53,7 @@ const LoginScreen = ({ navigation }) => {
                     
 
                         <Image
-                            source={require('../assets/logo.png')}
+                            source={require('../../assets/logo.png')}
                         //    style={styles.image}
                         // resizeMode="cover" 
                         />
@@ -64,18 +84,19 @@ const LoginScreen = ({ navigation }) => {
 
                     
                     <TextInput
-                        style={styles.input}
-
-                        
-                        placeholder="Email or Phone"
+                        style={styles.input}  
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={text => setEmail(text)}
 
                     />
 
 <TextInput
                         style={styles.input}
-
-                        
+                        value={password}
+                        onChangeText={text => setPassword(text)}
                         placeholder="Password"
+                        secureTextEntry
 
                     />
 
@@ -87,7 +108,7 @@ const LoginScreen = ({ navigation }) => {
 
 
                     <View style={styles.buttonView}>
-                        <TouchableOpacity onPress={() => { navigation.navigate("HomeScreen", { state: 0 }) }}>
+                        <TouchableOpacity onPress={handleLogin}>
 
                             <Card style={styles.submitbutton}>
 
@@ -301,4 +322,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default LoginScreen;
+export default DotLoginScreen;

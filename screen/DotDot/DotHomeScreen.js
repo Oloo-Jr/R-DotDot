@@ -3,50 +3,40 @@ import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Card from '../../components/card';
 import { Dimensions } from 'react-native';
 import TitleText from '../../components/TitleText';
-import MapView, { PROVIDER_GOOGLE, } from 'react-native-maps';
+import MapView from 'react-native-maps';
+import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-
 
 const DotHomeScreen =({ navigation }) => {
 
-    const [latlng, setLatLng] = useState({})
 
-    const checkPermission = async () => {
-      const hasPermission = await Location.requestForegroundPermissionsAsync();
-      if (hasPermission.status === 'granted') {
-        const permission = await askPermission();
-        return permission
-      }
-      return true
-    };
-  
-    const askPermission = async () => {
-      const permission = await Location.requestBackgroundPermissionsAsync();
-      return permission.status === 'granted';
-    };
-  
-  
-    const getLocation = async () => {
-      try {
-        const { granted } = await Location.requestBackgroundPermissionsAsync();
-        if (!granted) return;
-        const {
-          coords: { latitude, longitude },
-        } = await Location.getCurrentPositionAsync();
-        setLatLng({ latitude: latitude, longitude: longitude })
-      } catch (err) {
-  
-      }
-    }
-  
+    const [latlng, setLatLng] = useState({})
+    const [latitude, setLatitude] = useState(0)
+    const [longitude, setLongitude] = useState(0)
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+   
     const _map = useRef(1);
-  
+   
     useEffect(() => {
-      checkPermission();
-      getLocation()
-      console.log(latlng)
-        , []
-    })
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+  
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      })();
+    }, []);
+  
+    let text = 'Waiting...';
+    if (errorMsg) {
+      text = errorMsg;
+    } else if (location) {
+      text = JSON.stringify(location);
+    }
    
     return (
 
@@ -67,20 +57,14 @@ const DotHomeScreen =({ navigation }) => {
 
             </TouchableOpacity>
             </View>
-
-
-            <MapView
-                ref={_map}
+       
+       <MapView ref={_map}
                 provider={PROVIDER_GOOGLE}
                 style={styles.map}
                 showsUserLocation={true}
-                followsUserLocation={true}
-                
-            > 
-        
-            </MapView>
+                followsUserLocation={true}>
 
-
+       </MapView>
         </View>
 
 

@@ -7,6 +7,7 @@ import * as Font from 'expo-font';
 import React,{ useState, useEffect, useRef } from 'react'
 
 
+
 const fetchFonts = () => {
   return Font.loadAsync({
     'Lexend-lighter': require('./assets/fonts/Lexend-Light.ttf'),

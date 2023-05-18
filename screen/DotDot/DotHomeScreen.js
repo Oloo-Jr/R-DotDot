@@ -1,11 +1,12 @@
 import React, {useState,useRef,useEffect} from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity,  } from 'react-native';
 import Card from '../../components/card';
 import { Dimensions } from 'react-native';
 import TitleText from '../../components/TitleText';
 import MapView from 'react-native-maps';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
+
 
 const DotHomeScreen =({ navigation }) => {
 
@@ -18,6 +19,7 @@ const DotHomeScreen =({ navigation }) => {
    
     const _map = useRef(1);
    
+    
     useEffect(() => {
       (async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -63,6 +65,7 @@ const DotHomeScreen =({ navigation }) => {
                 style={styles.map}
                 showsUserLocation={true}
                 followsUserLocation={true}>
+                  <Marker  />
 
        </MapView>
         </View>

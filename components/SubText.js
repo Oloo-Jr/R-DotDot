@@ -3,7 +3,7 @@ import { Text, StyleSheet } from 'react-native';
 
 const SubText = props => (
 
-  <Text style={{ ...styles.title, ...props.style }}>{props.children}</Text>
+  <Text allowFontScaling={false} style={{ ...styles.title, ...props.style }}>{props.children}</Text>
 
 );
 

@@ -65,7 +65,7 @@ const DotHomeScreen =({ navigation }) => {
                 style={styles.map}
                 showsUserLocation={true}
                 followsUserLocation={true}>
-                  <Marker  />
+                 
 
        </MapView>
         </View>

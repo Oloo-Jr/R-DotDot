@@ -6,6 +6,14 @@
     "orientation": "portrait",
     "icon": "./assets/DotDotLogo.png",
     "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow R-DotDot to use your location."
+        }
+      ]
+    ],
     "splash": {
       "image": "./assets/DotDotLogo.png",
       "resizeMode": "contain",
@@ -28,7 +36,7 @@
         }
       },
       "package": "com.whim.DotDot",
-      "versionCode": 9,
+      "versionCode": 12,
       "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
     },
     "web": {

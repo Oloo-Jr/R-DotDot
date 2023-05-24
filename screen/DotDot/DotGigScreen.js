@@ -10,8 +10,6 @@ import { Marker } from 'react-native-maps';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { db,auth } from '../../Database/config';
 import { dbc } from '../../Database/ClientSide';
-import MapViewDirections from 'react-native-maps-directions';
-import { getDistance } from 'geolib';
 
 
 
@@ -20,19 +18,50 @@ import { getDistance } from 'geolib';
 const DotGigScreen = ({ navigation }) => {
     
     const [allgigs, setAllgigs] = useState([]);
-    const [latlng, setLatLng] = useState({})
+    const [location, setLocation] = useState([]);
+    const [address, setAddress] = useState("")
     const [refreshing, setRefreshing] = useState(false);
-    const [agentLatitude, setAgentLatitude] = useState(0);
-    const [agentLongitude, setAgentLongitude] = useState(0);
     const [buyerLatitude, setBuyerLatitude] = useState(0);
     const [buyerLongitude, setBuyerLongitude] = useState(0);
     const [isAccepted, setIsAccepted] = useState("");
     const [closedOrder, setCloseOrder] = useState(false);
     const [amount, setAmount] = useState(0);
-    const [pendingGigs, setPendingGigs] = useState([])
-    const [deliverygigs, setDeliveryGigs] = useState([])
+    const [pendingGigs, setPendingGigs] = useState([]);
+    const [deliverygigs, setDeliveryGigs] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [mpesaCode, setMpesaCode] = useState('');
+    const [agentcategory, setAgentCategory] = useState("");
+    const [agentfirstname, setAgentFirstName] = useState("");
+    const [agentlastname, setAgentLastName] = useState("");
+    const [agentvehicleregno, setAgentVehicleRegNo] = useState("");
+    const [agentvehiclemodel, setAgentVehicleModel] = useState("");
+    const [latitude, setLatitude] = useState(0);
+    const [longitude, setLongitude] = useState(0);
+    const [distance, setDistance] = useState(0);
+    const [timeinminutes, setTimeInMinutes] = useState(0);
+    const [couriercharges, setCourierCharges] = useState(0);
+    const [totalmoney, setTotalMoney] = useState(0);
+         
+
+    const getUserDetails = async () => {
+        const doc = await db.collection('DotDotUSers').doc(auth.currentUser.uid).get();
+        console.log(doc.data());
+        const category = doc.data().category;
+        const firstname = doc.data().firstname;
+        const lastname = doc.data().lastname;
+        const vehicleRegNo = doc.data().vrn;
+        const vehicleModel = doc.data().vehicleModel; 
+        
+        //store the agent data in a variable
+        setAgentCategory(category);
+        setAgentFirstName(firstname);
+        setAgentLastName(lastname);
+        setAgentVehicleRegNo(vehicleRegNo);
+        setAgentVehicleModel(vehicleModel);
+
+    
+  }
+
 
 
     const handleButtonPress = () => {
@@ -48,26 +77,29 @@ const DotGigScreen = ({ navigation }) => {
       };
 
 
-    const getDistance = (agentLatitude, agentLongitude, buyerLatitude, buyerLongitude) => {
-        const R = 6371; // Radius of the earth in km
-        const dLat = deg2rad(buyerLatitude - agentLatitude);
-        const dLon = deg2rad(buyerLongitude - agentLongitude);
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(deg2rad(agentLatitude)) *
-            Math.cos(deg2rad(buyerLatitude)) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c; // Distance in km
-        return distance;
-      };
-      
-      const deg2rad = (deg) => {
-        return deg * (Math.PI / 180);
-      };
-      
-    const distance = getDistance(agentLatitude, agentLongitude, buyerLatitude, buyerLongitude);
+   // Calculate the distance between two sets of coordinates
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in kilometers
+
+    return distance;
+  };
+
+  // Convert degrees to radians
+  const deg2rad = (deg) => {
+    return deg * (Math.PI / 180);
+  };
+
+
+     {/* 
+    const distance = getDistance(latitude, longitude, buyerLatitude, buyerLongitude);
 
     console.log(distance + "Km")
 
@@ -98,13 +130,13 @@ const DotGigScreen = ({ navigation }) => {
 
       const averageSpeed = 100; // km/hour
 
-      const calculateTimeToTravel = (agentLatitude, agentLongitude, buyerLatitude, buyerLongitude, averageSpeed) => {
-        const distance = getDistance(agentLatitude, agentLongitude, buyerLatitude, buyerLongitude); // getDistance function from previous example
+      const calculateTimeToTravel = (latitude, longitude, buyerLatitude, buyerLongitude, averageSpeed) => {
+        const distance = getDistance(latitude, longitude, buyerLatitude, buyerLongitude); // getDistance function from previous example
         const timeInMinutes = (distance / averageSpeed )*60;
         return timeInMinutes;
       };
       
-      const timeToTravel = calculateTimeToTravel(agentLatitude, agentLongitude, buyerLatitude, buyerLongitude, averageSpeed);
+      const timeToTravel = calculateTimeToTravel(latitude, longitude, buyerLatitude, buyerLongitude, averageSpeed);
         console.log(timeToTravel + " hours");
 
 
@@ -115,7 +147,8 @@ const DotGigScreen = ({ navigation }) => {
           
        const roundedDeliveryTime = roundTimeToWholeNumber(timeToTravel);
        console.log(roundedDeliveryTime);
-
+        
+        */}
 
 
   {/*  useEffect(() => {
@@ -132,24 +165,30 @@ const DotGigScreen = ({ navigation }) => {
       }, []); */}
 
 
-    //Accepting an order
+  {/*  //Accepting an order
     const handleUpdate = async (id) => {
         
       await dbc.collection('DotDotOrders').doc(id).update({
-          status: "Pending Delivery",
-         // agentid: auth.currentUser.uid
-         agentLatitude: agentLatitude,
-         agentLongitude: agentLongitude,
-         totalAmount,
-         roundedDeliveryTime,
-         roundedCourierCharges,
-         roundedDistance
+        status: "Pending Delivery",
+        agentId: auth.currentUser.uid,
+        agentLatitude: latitude,
+        agentLongitude: longitude,
+        totalMoney,
+        roundedDeliveryTime,
+        roundedCourierCharges,
+        roundedDistance,
+        agentcategory,
+        agentfirstname,
+        agentlastname,
+        agentvehiclemodel,
+        agentvehicleregno
         });
 
         setIsAccepted(id);
         getNewOrders();
         getPendingOrders();
       };
+    */}
 
       //Close an order
       const closeOrder = async(id)=> {
@@ -189,7 +228,7 @@ const getPendingOrders =async () => {
     setRefreshing(true);
 
     const pendinggigs = [];
-    const querySnapshot = await dbc.collection("DotDotOrders").where("status", "==", "Pending Delivery"  ).get();
+    const querySnapshot = await dbc.collection("DotDotOrders").where("status", "==", "Pending Delivery"  ).where("agentId", "==", auth.currentUser.uid).get();
     querySnapshot.forEach((doc) => {
         pendinggigs.push({ id: doc.id, ...doc.data() });
         // doc.data() is never undefined for query doc snapshots
@@ -214,7 +253,7 @@ const getDeliveryOrders =async () => {
     setRefreshing(true);
 
     const deliverygigs = [];
-    const querySnapshot = await dbc.collection("DotDotOrders").where("status", "==", "Pending Payment"  ).get();
+    const querySnapshot = await dbc.collection("DotDotOrders").where("status", "==", "Pending Payment"  ).where("agentId", "==", auth.currentUser.uid).get();
     querySnapshot.forEach((doc) => {
         deliverygigs.push({ id: doc.id, ...doc.data() });
         // doc.data() is never undefined for query doc snapshots
@@ -233,8 +272,6 @@ const getDeliveryOrders =async () => {
     
 } 
 
-
-    const _map = useRef(1);
 
     /*  const renderGridItem = itemData => {
           return (
@@ -255,33 +292,39 @@ const getDeliveryOrders =async () => {
 
     //Get the location of the user
     useEffect(() => {
-        geocode();
+        getUserDetails();
+       geocode();
         getNewOrders();
-        getLocation();
         getPendingOrders();
-        console.log(agentLatitude, agentLongitude)
+        console.log(latitude, longitude)
     }, [])
 
-    const getLocation = async () => {
-        try {
-          const { granted } = await Location.requestBackgroundPermissionsAsync();
-          if (!granted) return;
-          const {
-            coords: { latitude, longitude },
-          } = await Location.getCurrentPositionAsync();
-          setAgentLatitude(latitude)
-          setAgentLongitude(longitude)
-          console.log(agentLatitude,agentLongitude)
-        } catch (err) {
+   
+    useEffect(() => {
+        (async () => {
+          
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+          }
     
-        }
-      }
+          let location = await Location.getCurrentPositionAsync({});
+          setLatitude(location.coords.latitude);
+          setLongitude(location.coords.longitude);
+          console.log(location)
+        })();
+      }, []);
+
+      
+      
+
 
     //Get the Town using Latitude and Longitude
     const geocode = async () => {
         const geocodedAddress = await Location.reverseGeocodeAsync({
-            longitude: location.coords.longitude,
-            latitude: location.coords.latitude
+            longitude: longitude,
+            latitude: latitude
         });
         setAddress(geocodedAddress[0].city);
         console.log('reverseGeocode:');
@@ -295,7 +338,7 @@ const getDeliveryOrders =async () => {
       
             <View style={styles.prodImage}>
                 <Image
-                    source={{uri: item.currentImage}}
+                    source={{uri: item.imgUrl}}
                     style={styles.bannerimage}
                 // resizeMode="cover" 
                 />
@@ -303,15 +346,15 @@ const getDeliveryOrders =async () => {
 
             <View style={styles.orderDetails}>
                 <View style={styles.textView}>
-                    <Text style={styles.text1}>{item.currentQuantity}</Text>
-                    <Text style={styles.text2}>{item.currentPrice}</Text>
+                    <Text allowFontScaling={false} style={styles.text1}>{item.quantity}</Text>
+                    <Text allowFontScaling={false} style={styles.text2 }>{item.price}</Text>
                 </View>
 
                 <Card style={styles.additionsView}>
                     
                     <View style={styles.textView1}>
-                        <Text style={styles.text3}>Quantity</Text>
-                        <Text style={styles.text2}>1</Text>
+                        <Text allowFontScaling={false} style={styles.text3}>Quantity</Text>
+                        <Text allowFontScaling={false} style={styles.text2}>1</Text>
                     </View>
 
                     
@@ -321,12 +364,12 @@ const getDeliveryOrders =async () => {
                 <View style={styles.textView}>
                     <View style={styles.textView2}>
                         <MaterialIcons name="motorcycle" size={24} color="grey" />
-                        <Text  style={styles.text4}>Delivery {roundedDistance} Km</Text>
+                        <Text allowFontScaling={false}  style={styles.text4}>Delivery {distance} Km</Text>
                     </View>
 
                     <View style={styles.textView2}>
                         <MaterialIcons name="timer" size={24} color="red" />
-                        <Text style={styles.text4}>{roundedDeliveryTime} minutes</Text>
+                        <Text allowFontScaling={false} style={styles.text4}>{timeinminutes} minutes</Text>
                     </View>
                 </View>
 
@@ -334,9 +377,9 @@ const getDeliveryOrders =async () => {
                 <View style={styles.textView}>
                     <View style={styles.textView2}>
                         <MaterialIcons name="location-pin" size={24} color="black" />
-                        <Text style={styles.text5}>{item.address}</Text>
+                        <Text allowFontScaling={false} style={styles.text5}>{item.address}</Text>
                     </View>
-                    <Text style={styles.text2}>KES {roundedCourierCharges}</Text>
+                    <Text allowFontScaling={false} style={styles.text2}>{couriercharges}KES </Text>
                 </View>
 
                 
@@ -369,18 +412,18 @@ const getDeliveryOrders =async () => {
                         </View>
 
                         <View style={styles.nameDetail}>
-                            <Text style={styles.text2}>{item.userDisplayName}</Text>
+                            <Text allowFontScaling={false} style={styles.text2}>{item.userDisplayName}</Text>
                             <Card style={styles.callButton}>
-                                <Text style={styles.text6}>{item.userPhoneNumber}</Text>
+                                <Text allowFontScaling={false} style={styles.text6}>{item.userPhoneNumber}</Text>
                             </Card>
                         </View>
                     </View>
 
 
                     <View style={styles.customerDet}>
-                        <Text style={styles.text5}>Chosen payment method</Text>
+                        <Text allowFontScaling={false} style={styles.text5}>Chosen payment method</Text>
                         <Card style={styles.callButton}>
-                            <Text style={styles.text6}>To pay on delivery</Text>
+                            <Text allowFontScaling={false} style={styles.text6}>To pay on delivery</Text>
                         </Card>
                     </View>
                 </View>
@@ -389,8 +432,8 @@ const getDeliveryOrders =async () => {
 
                 <View style={styles.textView}>
 
-                    <Text  style={styles.text2d}>Total</Text>
-                    <Text style={styles.text2e}>KES {totalAmount}</Text>
+                    <Text allowFontScaling={false}  style={styles.text2d}>Total</Text>
+                    <Text allowFontScaling={false} style={styles.text2e}>KES {totalmoney} </Text>
                 </View>
 
 
@@ -399,7 +442,7 @@ const getDeliveryOrders =async () => {
         
                     <Card style={styles.declineButton}>
                     <TouchableOpacity onPress={handleButtonPress} >
-                        <Text style={styles.text2b}>
+                        <Text allowFontScaling={false} style={styles.text2b}>
                            Close Order
                         </Text>
                         </TouchableOpacity>
@@ -447,7 +490,7 @@ const getDeliveryOrders =async () => {
       
             <View style={styles.prodImage}>
                 <Image
-                    source={{uri: item.currentImage}}
+                    source={{uri: item.imgUrl}}
                     style={styles.bannerimage}
                 // resizeMode="cover" 
                 />
@@ -455,15 +498,15 @@ const getDeliveryOrders =async () => {
 
             <View style={styles.orderDetails}>
                 <View style={styles.textView}>
-                    <Text style={styles.text1}>{item.currentQuantity}</Text>
-                    <Text style={styles.text2}>{item.currentPrice}</Text>
+                    <Text allowFontScaling={false} style={styles.text1}>{item.quantity}</Text>
+                    <Text allowFontScaling={false} style={styles.text2}>{item.price}</Text>
                 </View>
 
                 <Card style={styles.additionsView}>
                     
                     <View style={styles.textView1}>
-                        <Text style={styles.text3}>Quantity</Text>
-                        <Text style={styles.text2}>1</Text>
+                        <Text allowFontScaling={false} style={styles.text3}>Quantity</Text>
+                        <Text allowFontScaling={false} style={styles.text2}>1</Text>
                     </View>
 
                     
@@ -473,12 +516,12 @@ const getDeliveryOrders =async () => {
                 <View style={styles.textView}>
                     <View style={styles.textView2}>
                         <MaterialIcons name="motorcycle" size={24} color="grey" />
-                        <Text  style={styles.text4}>Delivery {roundedDistance} Km</Text>
+                        <Text allowFontScaling={false}  style={styles.text4}>Delivery {distance.toFixed(0)} Km</Text>
                     </View>
 
                     <View style={styles.textView2}>
                         <MaterialIcons name="timer" size={24} color="red" />
-                        <Text style={styles.text4}>{roundedDeliveryTime} minutes</Text>
+                        <Text allowFontScaling={false} style={styles.text4}>{timeinminutes.toFixed(0)}minutes</Text>
                     </View>
                 </View>
 
@@ -486,9 +529,9 @@ const getDeliveryOrders =async () => {
                 <View style={styles.textView}>
                     <View style={styles.textView2}>
                         <MaterialIcons name="location-pin" size={24} color="black" />
-                        <Text style={styles.text5}>{item.address}</Text>
+                        <Text allowFontScaling={false} style={styles.text5}>{item.address}</Text>
                     </View>
-                    <Text style={styles.text2}>KES {roundedCourierCharges}</Text>
+                    <Text allowFontScaling={false} style={styles.text2}>KES {couriercharges.toFixed(2)} </Text>
                 </View>
 
                 
@@ -521,18 +564,18 @@ const getDeliveryOrders =async () => {
                         </View>
 
                         <View style={styles.nameDetail}>
-                            <Text style={styles.text2}>{item.userDisplayName}</Text>
+                            <Text allowFontScaling={false} style={styles.text2}>{item.userDisplayName}</Text>
                             <Card style={styles.callButton}>
-                                <Text style={styles.text6}>{item.userPhoneNumber}</Text>
+                                <Text allowFontScaling={false} style={styles.text6}>{item.userPhoneNumber}</Text>
                             </Card>
                         </View>
                     </View>
 
 
                     <View style={styles.customerDet}>
-                        <Text style={styles.text5}>Chosen payment method</Text>
+                        <Text allowFontScaling={false} style={styles.text5}>Chosen payment method</Text>
                         <Card style={styles.callButton}>
-                            <Text style={styles.text6}>To pay on delivery</Text>
+                            <Text allowFontScaling={false} style={styles.text6}>To pay on delivery</Text>
                         </Card>
                     </View>
                 </View>
@@ -541,16 +584,16 @@ const getDeliveryOrders =async () => {
 
                 <View style={styles.textView}>
 
-                    <Text  style={styles.text2d}>Total</Text>
-                    <Text style={styles.text2e}>KES {totalAmount}</Text>
+                    <Text allowFontScaling={false}  style={styles.text2d}>Total</Text>
+                    <Text allowFontScaling={false} style={styles.text2e}>KES {totalmoney.toFixed(2)} </Text>
                 </View>
 
 
 
                 <View style={styles.buttonView}>
         
-                    <Card style={styles.declineButton}>
-                        <Text style={styles.text2b}>
+                    <Card style={styles.pendingButton}>
+                        <Text allowFontScaling={false} style={styles.text2b}>
                             Wait for confirmation ...
                         </Text>
                     </Card>
@@ -581,16 +624,58 @@ const getDeliveryOrders =async () => {
 
     )
 
-    const renderOrders = ({ item }) => (
-        
+  // Render each user item in the FlatList
+  const renderOrders = ({ item }) => {
+    const distance = getDistance(
+        latitude,
+        longitude,
+        item.latitude,
+        item.longitude
+    );
+    //claculate the courier charge price depending on distance
+    const courierCharges = distance * 20
 
+    const averageSpeed = 80; // km/hour
+
+    const timeInMinutes = (distance / averageSpeed )*60;
+
+    const totalMoney = courierCharges + item.price
+
+     //Accepting an order
+     const handleUpdate = async (id) => {
+        
+        await dbc.collection('DotDotOrders').doc(id).update({
+          status: "Pending Delivery",
+          agentId: auth.currentUser.uid,
+          agentLatitude: latitude,
+          agentLongitude: longitude,
+          totalMoney,
+          timeInMinutes,
+          courierCharges,
+          distance,
+          agentcategory,
+          agentfirstname,
+          agentlastname,
+          agentvehiclemodel,
+          agentvehicleregno
+          });
+          setDistance(distance);
+          setTimeInMinutes(timeInMinutes);
+          setCourierCharges(courierCharges);
+          setTotalMoney(totalMoney);
+          setIsAccepted(id);
+          getNewOrders();
+          getPendingOrders();
+        };
+
+    return (
         <View style={styles.gigs}>
 
         <Card style={styles.prodCard}>
       
             <View style={styles.prodImage}>
                 <Image
-                   source={{uri: item.currentImage}}
+                   source={{uri: item.imgUrl}}
                     style={styles.bannerimage}
                 // resizeMode="cover" 
                 />
@@ -598,15 +683,15 @@ const getDeliveryOrders =async () => {
 
             <View style={styles.orderDetails}>
                 <View style={styles.textView}>
-                    <Text style={styles.text1}>{item.currentQuantity}</Text>
-                    <Text style={styles.text2}>{item.currentPrice}</Text>
+                    <Text allowFontScaling={false} style={styles.text1}>{item.quantity}</Text>
+                    <Text allowFontScaling={false} style={styles.text2}>{item.price}</Text>
                 </View>
 
                 <Card style={styles.additionsView}>
                     
                     <View style={styles.textView1}>
-                        <Text style={styles.text3}>Quantity</Text>
-                        <Text style={styles.text2}>1</Text>
+                        <Text allowFontScaling={false} style={styles.text3}>Quantity</Text>
+                        <Text allowFontScaling={false} style={styles.text2}>1</Text>
                     </View>
 
                     
@@ -616,12 +701,12 @@ const getDeliveryOrders =async () => {
                 <View style={styles.textView}>
                     <View style={styles.textView2}>
                         <MaterialIcons name="motorcycle" size={24} color="grey" />
-                        <Text  style={styles.text4}>Delivery {roundedDistance} Km</Text>
+                        <Text allowFontScaling={false}  style={styles.text4}>Delivery {distance.toFixed(2)} Km</Text>
                     </View>
 
                     <View style={styles.textView2}>
                         <MaterialIcons name="timer" size={24} color="red" />
-                        <Text style={styles.text4}>{roundedDeliveryTime} minutes</Text>
+                        <Text allowFontScaling={false} style={styles.text4}>{timeInMinutes.toFixed(0)} minutes</Text>
                     </View>
                 </View>
 
@@ -629,9 +714,9 @@ const getDeliveryOrders =async () => {
                 <View style={styles.textView}>
                     <View style={styles.textView2}>
                         <MaterialIcons name="location-pin" size={24} color="black" />
-                        <Text style={styles.text5}>{item.address}</Text>
+                        <Text allowFontScaling={false} style={styles.text5}>{item.address}</Text>
                     </View>
-                    <Text style={styles.text2}>KES {roundedCourierCharges}</Text>
+                    <Text allowFontScaling={false} style={styles.text2}>KES {courierCharges.toFixed(2)} </Text>
                 </View>
 
                 
@@ -664,18 +749,18 @@ const getDeliveryOrders =async () => {
                         </View>
 
                         <View style={styles.nameDetail}>
-                            <Text style={styles.text2}>{item.userDisplayName}</Text>
+                            <Text allowFontScaling={false} style={styles.text2}>{item.userDisplayName}</Text>
                             <Card style={styles.callButton}>
-                                <Text style={styles.text6}>{item.userPhoneNumber}</Text>
+                                <Text allowFontScaling={false} style={styles.text6}>{item.userPhoneNumber}</Text>
                             </Card>
                         </View>
                     </View>
 
 
                     <View style={styles.customerDet}>
-                        <Text style={styles.text5}>Chosen payment method</Text>
+                        <Text allowFontScaling={false} style={styles.text5}>Chosen payment method</Text>
                         <Card style={styles.callButton}>
-                            <Text style={styles.text6}>To pay on delivery</Text>
+                            <Text allowFontScaling={false} style={styles.text6}>To pay on delivery</Text>
                         </Card>
                     </View>
                 </View>
@@ -684,8 +769,8 @@ const getDeliveryOrders =async () => {
 
                 <View style={styles.textView}>
 
-                    <Text  style={styles.text2d}>Total</Text>
-                    <Text style={styles.text2e}>KES {totalAmount}</Text>
+                    <Text allowFontScaling={false}  style={styles.text2d}>Total</Text>
+                    <Text allowFontScaling={false} style={styles.text2e}>KES {totalMoney.toFixed(2)} </Text>
                 </View>
 
 
@@ -696,7 +781,7 @@ const getDeliveryOrders =async () => {
                 
                     <Card style={styles.declineButton}>
                     <TouchableOpacity onPress={() => closeOrder(item.id)}>
-                        <Text style={styles.text2b}>
+                        <Text allowFontScaling={false} style={styles.text2b}>
                             {closeOrder ? "Close Order" : "Wait for confirmation"}
                         </Text>
                         </TouchableOpacity>
@@ -704,7 +789,7 @@ const getDeliveryOrders =async () => {
                     : 
                     <>
                     <Card style={styles.declineButton}>
-                        <Text style={styles.text2b}>
+                        <Text allowFontScaling={false} style={styles.text2b}>
                             Decline
                         </Text>
                     </Card>
@@ -712,7 +797,7 @@ const getDeliveryOrders =async () => {
                     <Card style={styles.acceptButton}>
                        
                         <TouchableOpacity onPress={() => handleUpdate(item.id)}>
-                            <Text style={styles.text2c}>
+                            <Text allowFontScaling={false} style={styles.text2c}>
                                 Accept Request
                             </Text>
                         </TouchableOpacity>
@@ -741,6 +826,172 @@ const getDeliveryOrders =async () => {
     </View>
 
     );
+  };
+
+
+{/*
+    const renderOrders = ({ item }) => (
+        
+        
+
+        <View style={styles.gigs}>
+
+        <Card style={styles.prodCard}>
+      
+            <View style={styles.prodImage}>
+                <Image
+                   source={{uri: item.currentImage}}
+                    style={styles.bannerimage}
+                // resizeMode="cover" 
+                />
+            </View>
+
+            <View style={styles.orderDetails}>
+                <View style={styles.textView}>
+                    <Text allowFontScaling={false} style={styles.text1}>{item.currentQuantity}</Text>
+                    <Text allowFontScaling={false} style={styles.text2}>{item.currentPrice}</Text>
+                </View>
+
+                <Card style={styles.additionsView}>
+                    
+                    <View style={styles.textView1}>
+                        <Text allowFontScaling={false} style={styles.text3}>Quantity</Text>
+                        <Text allowFontScaling={false} style={styles.text2}>1</Text>
+                    </View>
+
+                    
+
+                </Card>
+
+                <View style={styles.textView}>
+                    <View style={styles.textView2}>
+                        <MaterialIcons name="motorcycle" size={24} color="grey" />
+                        <Text allowFontScaling={false}  style={styles.text4}>Delivery {roundedDistance} Km</Text>
+                    </View>
+
+                    <View style={styles.textView2}>
+                        <MaterialIcons name="timer" size={24} color="red" />
+                        <Text allowFontScaling={false} style={styles.text4}>{roundedDeliveryTime} minutes</Text>
+                    </View>
+                </View>
+
+
+                <View style={styles.textView}>
+                    <View style={styles.textView2}>
+                        <MaterialIcons name="location-pin" size={24} color="black" />
+                        <Text allowFontScaling={false} style={styles.text5}>{item.address}</Text>
+                    </View>
+                    <Text allowFontScaling={false} style={styles.text2}>KES {roundedCourierCharges}</Text>
+                </View>
+
+                
+                <MapView
+                    style={styles.mapView}
+                    
+                    
+                > 
+                <Marker coordinate={{ latitude: item.latitude, longitude: item.longitude }} />
+
+                
+            
+                </MapView>
+
+               
+
+
+                <View style={styles.textView}>
+
+
+                    <View style={styles.customerDet1}>
+                        <View style={styles.profileImage}>
+
+                            <Image
+                                source={require('../../assets/4k-background.png')}
+                                style={styles.bannerimage}
+                            // resizeMode="cover" 
+                            />
+
+                        </View>
+
+                        <View style={styles.nameDetail}>
+                            <Text allowFontScaling={false} style={styles.text2}>{item.userDisplayName}</Text>
+                            <Card style={styles.callButton}>
+                                <Text allowFontScaling={false} style={styles.text6}>{item.userPhoneNumber}</Text>
+                            </Card>
+                        </View>
+                    </View>
+
+
+                    <View style={styles.customerDet}>
+                        <Text allowFontScaling={false} style={styles.text5}>Chosen payment method</Text>
+                        <Card style={styles.callButton}>
+                            <Text allowFontScaling={false} style={styles.text6}>To pay on delivery</Text>
+                        </Card>
+                    </View>
+                </View>
+
+
+
+                <View style={styles.textView}>
+
+                    <Text allowFontScaling={false}  style={styles.text2d}>Total</Text>
+                    <Text allowFontScaling={false} style={styles.text2e}>KES {totalAmount}</Text>
+                </View>
+
+
+
+                <View style={styles.buttonView}>
+                {isAccepted && isAccepted === item.id ? 
+        
+                
+                    <Card style={styles.declineButton}>
+                    <TouchableOpacity onPress={() => closeOrder(item.id)}>
+                        <Text allowFontScaling={false} style={styles.text2b}>
+                            {closeOrder ? "Close Order" : "Wait for confirmation"}
+                        </Text>
+                        </TouchableOpacity>
+                    </Card>
+                    : 
+                    <>
+                    <Card style={styles.declineButton}>
+                        <Text allowFontScaling={false} style={styles.text2b}>
+                            Decline
+                        </Text>
+                    </Card>
+
+                    <Card style={styles.acceptButton}>
+                       
+                        <TouchableOpacity onPress={() => handleUpdate(item.id)}>
+                            <Text allowFontScaling={false} style={styles.text2c}>
+                                Accept Request
+                            </Text>
+                        </TouchableOpacity>
+                    </Card> 
+                    </> }
+                    
+
+                </View>
+
+
+
+
+            </View>
+
+
+
+
+
+        </Card>
+
+
+
+
+
+
+    </View>
+
+    );
+                */}
 
 
 
@@ -885,7 +1136,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Lexend-bold',
         fontSize: 15,
         color: 'red',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
 
     text2c: {
@@ -1046,6 +1297,20 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
 
         borderColor: 'red',
+        borderWidth: 1
+    },
+    pendingButton: {
+        //  flex: 1,
+
+        //paddingHorizontal: 20,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 100,
+        height: 32,
+        shadowOpacity: 0.2,
+
+        borderColor: '#2B5989',
         borderWidth: 1
     },
 
